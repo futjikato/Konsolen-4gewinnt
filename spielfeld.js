@@ -1,10 +1,12 @@
+var rows = 6;
 var filledFields = [];
+for(var i = 0; i < rows; i++) filledFields[i] = [];
 
 function getDecoratorRow() {
 	return "╠═╬═╬═╬═╬═╬═╬═╣\n";
 }
 function getDecoratorStartRow() {
-	return "╔═╦═╦═╦═╦═╦═╦═╗\n";
+	return " 1 2 3 4 5 6 7\n╔═╦═╦═╦═╦═╦═╦═╗\n";
 }
 function getDecoratorEndRow() {
 	return "╚═╩═╩═╩═╩═╩═╩═╝\n";
@@ -32,26 +34,20 @@ module.exports.getField = function(){
 	return output;
 };
 
-module.exports.isValid = function(x,y){
-	if(typeof filledFields[x] == 'object' && typeof filledFields[x][y] != 'undefined') {
-		return false;
-	}
-	if(x == 5) {
-		return true;
-	}
-	nx = x+1;
-	if(typeof filledFields[nx] == 'object' && typeof filledFields[nx][y] != 'undefined') {
-		return true;
-	}
-	console.log("ERROR - Unable to validate.");
-	return false;
+module.exports.isValid = function(c){
+	return typeof filledFields[0][c] == 'undefined';
 };
 
-module.exports.set = function(r,c,PlayerId) {
-	if(!filledFields[r]) {
-		filledFields[r] = [];
+module.exports.set = function(c,PlayerId) {
+	var row = rows - 1;
+	for(var r = 0; r < rows; r++) {
+		if(typeof filledFields[r][c] != 'undefined') {
+			row = r - 1;
+			break;
+		}
 	}
-	filledFields[r][c] = PlayerId;
+	filledFields[row][c] = PlayerId;
+	return row;
 }
 
 var winner = null;
@@ -93,4 +89,5 @@ module.exports.getWinner = function() {
 
 module.exports.reset = function() {
 	filledFields = [];
+	for(var i = 0; i < rows; i++) filledFields[i] = [];
 }

@@ -120,7 +120,7 @@ function waitForStart() {
 }
 
 function askForZug() {
-	rl.question('Was für einen Zug möchtest du machen ? Format muss `X,Y` sein. ( Oder ENDE um das Spiel zu beeenden. )', function(resp){
+	rl.question('Was für einen Zug möchtest du machen ? Format muss `X` sein. ( Oder ENDE um das Spiel zu beeenden. )', function(resp){
 		if(resp == 'ENDE') {
 			console.log('Danke, dass du 4gewinnt auf der Konsole gespielt hast.');
 			for(var i in players) {
@@ -131,17 +131,16 @@ function askForZug() {
 			}
 			process.exit(0);
 		}
-		var res = resp.replace("\n", "").match(/^([0-9]{1}),([0-9]{1})$/);
+		var res = resp.replace("\n", "").match(/^([1-7]{1})$/);
 		if(res) {
-			x = parseInt(res[1]);
-			y = parseInt(res[2]);
-			if(field.isValid(x, y)) {
+			var c = parseInt(res[1]) - 1;
+			if(field.isValid(c)) {
 				console.log('OK.');
-				field.set(x, y, 'H');
+				var r = field.set(c, 'H');
 				console.log(field.getField());
 
 				// check if host has won the game
-				if(field.isFinished(x,y,'H')) {
+				if(field.isFinished(r,c,'H')) {
 					var winner = field.getWinner();
 					console.log('Du hast gewonnen :)');
 					sendMsg('win', 'Der Host hat gewonnen.');

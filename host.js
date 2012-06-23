@@ -19,18 +19,6 @@ function Host() {
 var host = new Host();
 players.push(host);
 
-function sendeZug(zugdata, sender) {
-	// sende an alle spieler
-	for(var i in players) {
-		if(players[i] && players[i] != sender) {
-			players[i].write(JSON.stringify({
-				a:'zug',
-				content :zugdata
-			}));
-		}
-	}
-}
-
 function sendMsg(type, msg) {
 	// sende an alle spieler
 	for(var i in players) {
@@ -70,6 +58,8 @@ var server = net.createServer(function(socket){
 		}
 	}));
 
+	console.log('New Player with id `' + pid + '` has joined.');
+
 	// zug
 	socket.on('data', function(msg){
 		// prüfe ob der spieler am zug ist
@@ -87,10 +77,10 @@ var server = net.createServer(function(socket){
 		}
 
 		// setze im feld
-		field.set();
+		field.set(data.c, pid);
 		
 		// send
-		sendeZug(data);
+		sendMsg('field', {field:field.getField()});
 	});
 
 	// dissconnect
@@ -98,6 +88,7 @@ var server = net.createServer(function(socket){
 		for(var i in players){if(players[i] == socket) delete players[i]}
 	});
 });
+server.listen(1389);
 
 /* START THE GAAAAAAAAMMMMMEEEEEEE */
 
@@ -139,6 +130,8 @@ function askForZug() {
 				var r = field.set(c, 'H');
 				console.log(field.getField());
 
+				sendMsg('field', {field:field.getField()});
+
 				// check if host has won the game
 				if(field.isFinished(r,c,'H')) {
 					var winner = field.getWinner();
@@ -146,6 +139,7 @@ function askForZug() {
 					sendMsg('win', 'Der Host hat gewonnen.');
 					field.reset();
 					waitForStart();
+					sendMsg('winner', {winner:winner});
 					return;
 				}
 
@@ -165,13 +159,19 @@ function askForZug() {
 function nextTurn(lastPlayer) {
 	var next = false;
 	for(var i in players) {
+
 		if(next) {
-			players[i].write(JSON.stringify({a:'yourturn'}));
+			amZug = players[i];
+			players[i].write(JSON.stringify({a:'yourturn', content:{field:field.getField()}}));
+			break;
 		}
+
+		// singleplayer game with just one host
 		if(players[i] == lastPlayer) {
 			next = true;
 			if(i == (players.length - 1)) {
-				players[0].write(JSON.stringify({a:'yourturn'}));
+				amZug = players[0];
+				players[0].write(JSON.stringify({a:'yourturn', content:{field:field.getField()}}));
 			}
 		}
 	}		

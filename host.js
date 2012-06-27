@@ -42,6 +42,7 @@ function sendField() {
 var server = net.createServer(function(socket){
 
 	if(allowNewPlayers == false) {
+        console.log('Player access denied');
 		socket.destroy();
 		return;
 	}
@@ -88,7 +89,9 @@ var server = net.createServer(function(socket){
 		for(var i in players){if(players[i] == socket) delete players[i]}
 	});
 });
-server.listen(1389);
+server.listen(1389, function(){
+    waitForStart();
+});
 
 /* START THE GAAAAAAAAMMMMMEEEEEEE */
 
@@ -176,5 +179,3 @@ function nextTurn(lastPlayer) {
 		}
 	}		
 }
-
-waitForStart();

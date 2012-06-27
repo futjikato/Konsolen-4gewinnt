@@ -45,17 +45,14 @@ var handler = new ActionHandler();
 
 function connect(ip, port) {
 	try {
-		socket = net.connect(ip, port, function(){
+        console.log('Try to conect to ' + ip + ':' + port);
+		socket = net.connect(port, ip, function(){
 			console.log('Connected to host ! Wating for further infos from host.');
 		});
 
 		socket.on('data', function(buffer){
 			var data = JSON.parse(buffer.toString());
-			handler.process(data, function(err, resp){
-				if(err) {
-					console.log(err.toString());
-					throw err;
-				}
+			handler.process(data, function(resp){
 				// if response is an object send it as response
 				if(typeof resp == 'object') {
 					socket.write(JSON.stringify(resp));
@@ -64,7 +61,7 @@ function connect(ip, port) {
 		});
 
 		socket.on('error', function(err){
-			console.log(err.toString());
+			console.log("ERROR => " + err.toString());
 		});
 	} catch(e) {
 		console.log('No connection to host.');

@@ -17,7 +17,27 @@ function Host() {
 	}
 }
 var host = new Host();
-players.push(host);
+players.push(host)
+
+var api = {
+	move: function(data) {
+		field.set(data.c, data.id);
+		sendMsg('field', {field:field.getField()});
+		console.log(field.getField());
+		
+		// check if player has won the game
+		if(field.isFinished()) {
+			var winner = field.getWinner();
+			console.log('Player ' + winner + ' has won !');
+			field.reset();
+			waitForStart();
+			sendMsg('winner', {winner:winner});
+			return;
+		}
+		
+		nextTurn(amZug);
+	}
+};
 
 function sendMsg(type, msg) {
 	// sende an alle spieler
@@ -63,25 +83,30 @@ var server = net.createServer(function(socket){
 
 	// zug
 	socket.on('data', function(msg){
-		// prüfe ob der spieler am zug ist
-		if(socket != amZug) {
-			console.log('Unvalid message');
-			socket.write(JSON.stringify({err:1,msg:'Du bist nicht drann.'}));
-			return;
-		}
 		// prüfe ob die nachricht valide ist
 		try {
 			data = JSON.parse(msg.toString());
 		} catch (e) {
+			console.log('Invalid message recieved.');
 			socket.write(JSON.stringify({err:1,msg:'Invalide Nachricht'}));
 			return;
 		}
-
-		// setze im feld
-		field.set(data.c, pid);
 		
-		// send
-		sendMsg('field', {field:field.getField()});
+		if(data.a == 'move') {
+			// prüfe ob der spieler am zug ist
+			if(socket != amZug) {
+				console.log('Unvalid message');
+				socket.write(JSON.stringify({err:1,msg:'Du bist nicht drann.'}));
+				return;
+			}
+		}
+		
+		if(typeof api[data.a] == 'function') {
+			api[data.a](data.content);
+		} else {
+			console.log('Invalid api call recieved.');
+			socket.write(JSON.stringify({err:1,msg:'Invalide api call'}));
+		}
 	});
 
 	// dissconnect
@@ -97,9 +122,15 @@ server.listen(1389, function(){
 
 function waitForStart() {
 	allowNewPlayers = true;
-	rl.question('Warte auf Mitspieler. Schreibe START um zu starten.', function(resp){
+	rl.question("Warte auf Mitspieler. Schreibe START um zu starten.\n", function(resp){
 		if(resp == 'START') {
 			allowNewPlayers = false;
+			
+			// notice all palyers about game start
+			sendMsg('start', {});
+			// send all players empty field
+			sendMsg('field', {field:field.getField()});
+			
 			amZug = 'host'; // host macht ersten zug
 			console.log(field.getField());
 			askForZug();
@@ -136,10 +167,9 @@ function askForZug() {
 				sendMsg('field', {field:field.getField()});
 
 				// check if host has won the game
-				if(field.isFinished(r,c,'H')) {
+				if(field.isFinished()) {
 					var winner = field.getWinner();
 					console.log('Du hast gewonnen :)');
-					sendMsg('win', 'Der Host hat gewonnen.');
 					field.reset();
 					waitForStart();
 					sendMsg('winner', {winner:winner});

@@ -1,5 +1,7 @@
-var rows = 6;
-var filledFields = [];
+var rows = 6,
+	filledFields = [],
+	fin = false;
+
 for(var i = 0; i < rows; i++) filledFields[i] = [];
 
 function getDecoratorRow() {
@@ -39,6 +41,17 @@ module.exports.isValid = function(c){
 };
 
 module.exports.set = function(c,PlayerId) {
+
+	function checkWin(x, y) {
+		var dirs = ['o','u','l','r','lu','ru','lo','ro'];
+		for(var i in dirs) {
+			if(checkDirWin(dirs[i], x, y, 0, PlayerId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	var row = rows - 1;
 	for(var r = 0; r < rows; r++) {
 		if(typeof filledFields[r][c] != 'undefined') {
@@ -47,6 +60,12 @@ module.exports.set = function(c,PlayerId) {
 		}
 	}
 	filledFields[row][c] = PlayerId;
+	
+	if(checkWin(row, c)) {
+		fin = true;
+		winner = PlayerId;
+	}
+	
 	return row;
 }
 
@@ -73,15 +92,8 @@ function checkDirWin(dir, x, y, i, playerid) {
 	return false;
 }
 
-module.exports.isFinished = function(x,y,playerid) {
-	var dirs = ['o','u','l','r','lu','ru','lo','ro'];
-	for(var i in dirs) {
-		if(checkDirWin(dirs[i], x, y, 0, playerid)) {
-			winner = playerid;
-			return true;
-		}
-	}
-	console.log('no winning turn');
+module.exports.isFinished = function() {
+	return fin;
 }
 module.exports.getWinner = function() {
 	return winner;

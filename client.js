@@ -12,14 +12,21 @@ function ActionHandler() {
 			console.log(data.msg);
 		},
 		yourturn : function(data, cb) {
-			askForTurn(cb);
+			// ask player for move
+			askForTurn(function(data){
+				// send data as move
+				cb('move', data);
+			});
 		},
 		field : function(data) {
 			console.log('New field.');
 			console.log(data.field);
 		},
-		winner : function(dtaa) {
-			console.log(data.winner + "has won the game !");
+		winner : function(data) {
+			console.log(data.winner + " has won the game !");
+		},
+		start: function(data) {
+			console.log("\nGAME HAS STARTED !\n");
 		}
 	}
 
@@ -52,10 +59,13 @@ function connect(ip, port) {
 
 		socket.on('data', function(buffer){
 			var data = JSON.parse(buffer.toString());
-			handler.process(data, function(resp){
-				// if response is an object send it as response
-				if(typeof resp == 'object') {
-					socket.write(JSON.stringify(resp));
+			handler.process(data, function(apiCall, apiData){
+				// if api method name and data exist send it
+				if(apiCall && typeof apiData == 'object') {
+					socket.write(JSON.stringify({
+						a		: apiCall,
+						content	: apiData
+					}));
 				}
 			});
 		});
@@ -88,7 +98,7 @@ function askForTurn(cb) {
 			return;
 		}
 		cb({
-			c : c,
+			c : --c,
 			id : playid
 		});
 	});

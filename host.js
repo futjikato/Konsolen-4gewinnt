@@ -20,8 +20,14 @@ var host = new Host();
 players.push(host)
 
 var api = {
-	move: function(data) {
-		field.set(data.c, data.id);
+	move: function(data, socket) {
+		// check if turn was valid on the battlefield
+		if(field.set(data.c, data.id) < 0) {
+			console.log('Invalid turn. Check if the column is free.');
+			socket.write(JSON.stringify({err:1,msg:'Invalid turn. Check if the column is free.'}));
+			return;
+		}
+
 		sendMsg('field', {field:field.getField()});
 		console.log(field.getField());
 		
@@ -102,7 +108,7 @@ var server = net.createServer(function(socket){
 		}
 		
 		if(typeof api[data.a] == 'function') {
-			api[data.a](data.content);
+			api[data.a](data.content, socket);
 		} else {
 			console.log('Invalid api call recieved.');
 			socket.write(JSON.stringify({err:1,msg:'Invalide api call'}));

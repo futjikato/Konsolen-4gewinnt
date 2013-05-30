@@ -40,6 +40,10 @@ module.exports.isValid = function(c){
 	return typeof filledFields[0][c] == 'undefined';
 };
 
+/**
+ * Set a player id into battlefield
+ * Returns -1 on error
+ */
 module.exports.set = function(c,PlayerId) {
 
 	function checkWin(x, y) {
@@ -53,12 +57,18 @@ module.exports.set = function(c,PlayerId) {
 	}
 
 	var row = rows - 1;
+
 	for(var r = 0; r < rows; r++) {
 		if(typeof filledFields[r][c] != 'undefined') {
 			row = r - 1;
 			break;
 		}
 	}
+
+	if(row < 0) {
+		return -1;
+	}
+
 	filledFields[row][c] = PlayerId;
 	
 	if(checkWin(row, c)) {

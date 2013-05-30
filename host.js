@@ -4,7 +4,11 @@ var net = require('net'),
 	history = [],
 	field = require('./spielfeld.js'),
 	rl = require('readline').createInterface(process.stdin, process.stdout),
-	allowNewPlayers = true;
+	allowNewPlayers = true,
+	red = '\u001b[31m',
+	blue = '\u001b[34m',
+	yellow = '\u001b[33m',
+	cReset = '\u001b[0m';
 
 // DUMMY object
 function Host() {
@@ -128,7 +132,7 @@ server.listen(1389, function(){
 
 function waitForStart() {
 	allowNewPlayers = true;
-	rl.question("Warte auf Mitspieler. Schreibe START um zu starten.\n", function(resp){
+	rl.question("Warte auf Mitspieler. Schreibe " + blue + "START" + cReset + " um zu starten.\n", function(resp){
 		if(resp == 'START') {
 			allowNewPlayers = false;
 			
@@ -151,7 +155,7 @@ function waitForStart() {
 }
 
 function askForZug() {
-	rl.question('Was für einen Zug möchtest du machen ? Format muss `X` sein. ( Oder ENDE um das Spiel zu beeenden. )', function(resp){
+	rl.question('Was für einen Zug möchtest du machen ? Format muss `X` sein. ( Oder ' + blue +'ENDE' + cReset + ' um das Spiel zu beeenden. )', function(resp){
 		if(resp == 'ENDE') {
 			console.log('Danke, dass du 4gewinnt auf der Konsole gespielt hast.');
 			for(var i in players) {

@@ -155,7 +155,7 @@ function waitForStart() {
 }
 
 function askForZug() {
-	rl.question('Was für einen Zug möchtest du machen ? Format muss `X` sein. ( Oder ' + blue +'ENDE' + cReset + ' um das Spiel zu beeenden. )', function(resp){
+	rl.question('Gib die Nummer der Spalte an in welche du nun einen Block legen möchtest. ( Oder ' + blue +'ENDE' + cReset + ' um das Spiel zu beeenden. )', function(resp){
 		if(resp == 'ENDE') {
 			console.log('Danke, dass du 4gewinnt auf der Konsole gespielt hast.');
 			for(var i in players) {

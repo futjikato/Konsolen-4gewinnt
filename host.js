@@ -62,6 +62,7 @@ function sendMsg(type, msg) {
 }
 
 function printField() {
+	console.log('\u001b[2J');
 	process.stdout.write(field.getField());
 }
 
@@ -172,7 +173,7 @@ function askForZug() {
 			if(field.isValid(c)) {
 				console.log('OK.');
 				var r = field.set(c, 'H');
-				console.log(field.getField());
+				printField();
 
 				sendMsg('field', {field:field.getField()});
 

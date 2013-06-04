@@ -19,6 +19,7 @@ function ActionHandler() {
 			});
 		},
 		field : function(data) {
+			console.log('\u001b[2J');
 			console.log('New field.');
 			console.log(data.field);
 		},

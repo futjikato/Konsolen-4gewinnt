@@ -2,7 +2,7 @@ var rows = 6,
 	filledFields = [],
 	fin = false,
 	lastSet = [0,0],
-	red = '\u001b[31m',
+	red = '\u001b[1;31m',
 	blue = '\u001b[34m',
 	yellow = '\u001b[33m',
 	cReset = '\u001b[0m';
@@ -122,6 +122,9 @@ module.exports.getWinner = function() {
 }
 
 module.exports.reset = function() {
+	fin = false;
+	lastSet = [0,0],
+	winner = null;
 	filledFields = [];
 	for(var i = 0; i < rows; i++) filledFields[i] = [];
 }
